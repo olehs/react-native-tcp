@@ -7,11 +7,15 @@ import java.net.InetSocketAddress;
  */
 public interface TcpSocketListener {
     // server
-    void onConnection(Integer serverId, Integer clientId, InetSocketAddress socketAddress);
+    void onConnection(Integer serverId, Integer clientId, InetSocketAddress remoteAddress,
+            InetSocketAddress localAddress);
 
     // client and server
     void onConnect(Integer id, InetSocketAddress socketAddress);
+
     void onData(Integer id, byte[] data);
+
     void onClose(Integer id, String error);
+
     void onError(Integer id, String error);
 }

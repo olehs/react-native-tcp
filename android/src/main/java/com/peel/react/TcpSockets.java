@@ -78,9 +78,7 @@ public final class TcpSockets extends ReactContextBaseJavaModule implements TcpS
     }
 
     private void sendEvent(String eventName, WritableMap params) {
-        mReactContext
-            .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
-            .emit(eventName, params);
+        mReactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit(eventName, params);
     }
 
     @ReactMethod
@@ -151,7 +149,8 @@ public final class TcpSockets extends ReactContextBaseJavaModule implements TcpS
     /** TcpSocketListener */
 
     @Override
-    public void onConnection(Integer serverId, Integer clientId, InetSocketAddress socketAddress) {
+    public void onConnection(Integer serverId, Integer clientId, InetSocketAddress remoteAddress,
+            InetSocketAddress localAddress) {
         if (mShuttingDown) {
             return;
         }
@@ -161,14 +160,21 @@ public final class TcpSockets extends ReactContextBaseJavaModule implements TcpS
         WritableMap infoParams = Arguments.createMap();
         infoParams.putInt("id", clientId);
 
-        final InetAddress address = socketAddress.getAddress();
+        final InetAddress remote = remoteAddress.getAddress();
+        final InetAddress local = localAddress.getAddress();
 
-        WritableMap addressParams = Arguments.createMap();
-        addressParams.putString("address", address.getHostAddress());
-        addressParams.putInt("port", socketAddress.getPort());
-        addressParams.putString("family", address instanceof Inet6Address ? "IPv6" : "IPv4");
+        WritableMap remoteAddressParams = Arguments.createMap();
+        remoteAddressParams.putString("address", remote.getHostAddress());
+        remoteAddressParams.putInt("port", remoteAddress.getPort());
+        remoteAddressParams.putString("family", remote instanceof Inet6Address ? "IPv6" : "IPv4");
 
-        infoParams.putMap("address", addressParams);
+        WritableMap localAddressParams = Arguments.createMap();
+        localAddressParams.putString("address", local.getHostAddress());
+        localAddressParams.putInt("port", localAddress.getPort());
+        localAddressParams.putString("family", local instanceof Inet6Address ? "IPv6" : "IPv4");
+
+        infoParams.putMap("address", remoteAddressParams);
+        infoParams.putMap("localAddress", localAddressParams);
         eventParams.putMap("info", infoParams);
 
         sendEvent("connection", eventParams);

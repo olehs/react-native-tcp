@@ -107,7 +107,10 @@ public final class TcpSocketManager {
 
                 TcpSocketListener listener = mListener.get();
                 if (listener != null) {
-                    listener.onConnection(cId, mInstances, remoteAddress);
+                    final InetSocketAddress localSocketAddress = socketConverted != null
+                            ? new InetSocketAddress(socketConverted.getLocalAddress(), socketConverted.getLocalPort())
+                            : localAddress;
+                    listener.onConnection(cId, mInstances, remoteAddress, localSocketAddress);
                 }
 
                 mInstances++;
@@ -137,7 +140,7 @@ public final class TcpSocketManager {
         mServer.connectSocket(socketAddress, new ConnectCallback() {
             @Override
             public void onConnectCompleted(Exception ex, AsyncSocket socket) {
-              TcpSocketListener listener = mListener.get();
+                TcpSocketListener listener = mListener.get();
                 if (ex == null) {
                     mClients.put(cId, socket);
                     setSocketCallbacks(cId, socket);
@@ -146,7 +149,7 @@ public final class TcpSocketManager {
                         listener.onConnect(cId, socketAddress);
                     }
                 } else if (listener != null) {
-                   listener.onError(cId, ex.getMessage());
+                    listener.onError(cId, ex.getMessage());
                 }
             }
         });
@@ -170,7 +173,7 @@ public final class TcpSocketManager {
         } else {
             TcpSocketListener listener = mListener.get();
             if (listener != null) {
-               listener.onError(cId, "unable to find socket");
+                listener.onError(cId, "unable to find socket");
             }
         }
     }
