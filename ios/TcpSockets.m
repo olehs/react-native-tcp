@@ -40,6 +40,11 @@ RCT_EXPORT_MODULE()
     return self;
 }
 
++ (BOOL)requiresMainQueueSetup
+{
+  return NO;
+}
+
 - (NSNumber*)getNextTag {
     return [NSNumber numberWithLong:_tag++];
 }
@@ -147,14 +152,20 @@ RCT_EXPORT_METHOD(listen:(nonnull NSNumber*)cId
 - (void)onConnect:(TcpSocketClient*) client
 {
     [self sendEventWithName:@"connect"
-                       body:@{ @"id": client.id, @"address" : [client getAddress] }];
+                       body:@{ @"id": client.id, @"address" : [client getAddress:false] }];
 }
 
 -(void)onConnection:(TcpSocketClient *)client toClient:(NSNumber *)clientID {
     _clients[client.id] = client;
 
     [self sendEventWithName:@"connection"
-                       body:@{ @"id": clientID, @"info": @{ @"id": client.id, @"address" : [client getAddress] } }];
+                       body:@{ @"id": clientID,
+                               @"info": @{
+                                       @"id": client.id,
+                                       @"address" : [client getAddress:true],
+                                       @"localAddress" : [client getAddress:false]
+                               }
+                       }];
 }
 
 - (void)onData:(NSNumber *)clientID data:(NSData *)data

@@ -4,20 +4,20 @@
  */
 
 #import <React/RCTBridgeModule.h>
-#import "CocoaAsyncSocket/GCDAsyncSocket.h"
+#import "GCDAsyncSocket.h"
 
 extern NSString *const RCTTCPErrorDomain;
 
 enum RCTTCPError
 {
-    RCTTCPNoError = 0,           // Never used
-    RCTTCPInvalidInvocationError,// Invalid method invocation
-    RCTTCPBadConfigError,        // Invalid configuration
-    RCTTCPBadParamError,         // Invalid parameter was passed
-    RCTTCPSendTimeoutError,      // A send operation timed out
-    RCTTCPSendFailedError,       // A send operation failed
-    RCTTCPClosedError,           // The socket was closed
-    RCTTCPOtherError,            // Description provided in userInfo
+    RCTTCPNoError = 0,            // Never used
+    RCTTCPInvalidInvocationError, // Invalid method invocation
+    RCTTCPBadConfigError,         // Invalid configuration
+    RCTTCPBadParamError,          // Invalid parameter was passed
+    RCTTCPSendTimeoutError,       // A send operation timed out
+    RCTTCPSendFailedError,        // A send operation failed
+    RCTTCPClosedError,            // The socket was closed
+    RCTTCPOtherError,             // Description provided in userInfo
 };
 
 typedef enum RCTTCPError RCTTCPError;
@@ -26,23 +26,23 @@ typedef enum RCTTCPError RCTTCPError;
 
 @protocol SocketClientDelegate <NSObject>
 
-- (void)onConnect:(TcpSocketClient*)client;
-- (void)onConnection:(TcpSocketClient*)client toClient:(NSNumber *)clientID;
+- (void)onConnect:(TcpSocketClient *)client;
+- (void)onConnection:(TcpSocketClient *)client toClient:(NSNumber *)clientID;
 - (void)onData:(NSNumber *)clientID data:(NSData *)data;
-- (void)onClose:(TcpSocketClient*)client withError:(NSError *)err;
-- (void)onError:(TcpSocketClient*)client withError:(NSError *)err;
-- (NSNumber*)getNextTag;
+- (void)onClose:(TcpSocketClient *)client withError:(NSError *)err;
+- (void)onError:(TcpSocketClient *)client withError:(NSError *)err;
+- (NSNumber *)getNextTag;
 - (void)setPendingSend:(RCTResponseSenderBlock)callback forKey:(NSNumber *)key;
 - (RCTResponseSenderBlock)getPendingSend:(NSNumber *)key;
 - (void)dropPendingSend:(NSNumber *)key;
-- (NSNumber*)getNextId;
+- (NSNumber *)getNextId;
 
 @end
 
-@interface TcpSocketClient : NSObject<GCDAsyncSocketDelegate>
+@interface TcpSocketClient : NSObject <GCDAsyncSocketDelegate>
 
-@property (nonatomic, retain) NSNumber * id;
-@property (nonatomic, weak) id<SocketClientDelegate> clientDelegate;
+@property(nonatomic, retain) NSNumber *id;
+@property(nonatomic, weak) id<SocketClientDelegate> clientDelegate;
 
 ///---------------------------------------------------------------------------------------
 /// @name Class Methods
@@ -55,7 +55,7 @@ typedef enum RCTTCPError RCTTCPError;
  * @return New RCTTCPClient
  */
 
-+ (id)socketClientWithId:(NSNumber *)clientID andConfig:(id<SocketClientDelegate>) delegate;
++ (id)socketClientWithId:(NSNumber *)clientID andConfig:(id<SocketClientDelegate>)delegate;
 
 ///---------------------------------------------------------------------------------------
 /// @name Instance Methods
@@ -84,13 +84,13 @@ typedef enum RCTTCPError RCTTCPError;
  *
  * @return NSDictionary with @"address" host, @"port" port, @"family" IPv4/IPv6
  */
-- (NSDictionary<NSString *, id> *)getAddress;
+- (NSDictionary<NSString *, id> *)getAddress:(BOOL)remote;
 
 /**
  * write data
  *
  */
-- (void)writeData:(NSData*) data callback:(RCTResponseSenderBlock) callback;
+- (void)writeData:(NSData *)data callback:(RCTResponseSenderBlock)callback;
 
 /**
  * end client
@@ -101,6 +101,5 @@ typedef enum RCTTCPError RCTTCPError;
  * destroy client
  */
 - (void)destroy;
-
 
 @end
